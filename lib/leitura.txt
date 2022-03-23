@@ -1,0 +1,45 @@
+PAG VER ESPORTES +OU- FUNCIONANDO
+
+
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class veresportes extends StatelessWidget {
+  const veresportes({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    CollectionReference noticias =
+        FirebaseFirestore.instance.collection("noticias");
+    return FutureBuilder<QuerySnapshot>(
+        future: noticias.get(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            print("erro na conexao");
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            print("carregando");
+          }
+          return ListView(
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data()! as Map<String, dynamic>;
+
+              if (data['tipo_noticia'] == 'noticiaesporte') {
+                return Material(
+                  child: ListTile(
+                    title: Text(data['titulo_noticia']),
+                    subtitle: Text(data['descricao_noticia']),
+                  ),
+                );
+              } else {
+                return Material(
+                  child: ListView(),
+                );
+              }
+            }).toList(),
+          );
+        });
+  }
+}
